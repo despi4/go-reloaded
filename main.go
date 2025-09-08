@@ -7,11 +7,14 @@ import (
 	goreloaded "go-reloaded/auto-correction"
 )
 
+// (hex), (bin) numeric cmd's
+// (up), (low), (cap) alpha cmd's
+
 func main() {
 	args := os.Args[1:]
 
 	text := ReadText(CheckInput(args))
-	goreloaded.HexCommandClear(text)
+	goreloaded.ClearHexBin(text)
 }
 
 func CheckInput(input []string) string {

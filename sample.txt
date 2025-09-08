@@ -10,4 +10,10 @@ FF FF (hex)
 5A (Hexsaohg)
 ff aa (hex12)
 mm (Hex134)
-/(HEX14)
+/ (HEX14)
+al (hEx,./.1)
+It has been 10 (bin) years, 
+1010 (Bin), 101 
+(bin,3), 
+10(Bin)
+12(Bin)
