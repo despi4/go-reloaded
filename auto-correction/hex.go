@@ -1,7 +1,6 @@
 package goreloaded
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"regexp"
@@ -9,17 +8,6 @@ import (
 )
 
 var hexPattern = `(?i)([0-9a-f]+)\s*\(hex(?:,\d+)?\)`
-
-func HexCommandClear(text string) {
-	var (
-		noDigitRegular   = regexp.MustCompile(`(?i)([0-9a-f]+)\s*\(hex(?:.+)?\)`)
-		withDigitRegular = regexp.MustCompile(`(?i)\s*\(hex(?:.+)?\)`)
-	)
-
-	fmt.Println(noDigitRegular.FindAllString(text, -1))
-
-	fmt.Println(withDigitRegular.FindAllString(text, -1))
-}
 
 func HexToDec(text string) string {
 	regular := regexp.MustCompile(hexPattern)
@@ -33,7 +21,7 @@ func HexToDec(text string) string {
 		'F': 15,
 	}
 
-	convertedText := regular.ReplaceAllStringFunc(text, func(s string) string {
+	hexConverted := regular.ReplaceAllStringFunc(text, func(s string) string {
 		decimal := 0
 		length := -1
 
@@ -73,5 +61,5 @@ func HexToDec(text string) string {
 		return strconv.Itoa(decimal)
 	})
 
-	return convertedText
+	return hexConverted
 }
