@@ -21,7 +21,7 @@ func HexToDec(text string) string {
 		'F': 15,
 	}
 
-	hexConverted := regular.ReplaceAllStringFunc(text, func(s string) string {
+	hexConverter := regular.ReplaceAllStringFunc(text, func(s string) string {
 		decimal := 0
 		length := -1
 
@@ -61,5 +61,5 @@ func HexToDec(text string) string {
 		return strconv.Itoa(decimal)
 	})
 
-	return hexConverted
+	return hexConverter
 }

@@ -6,14 +6,14 @@ import (
 	"strconv"
 )
 
-var binPattern = `(?i)([0-9a-f]+)\s*\(bin(?:,\d+)?\)`
+var binPattern = `(?i)([0-9a-f]+)\s*\(bin(?:, \d+)?\)`
 
 func BinToDec(text string) string {
 	regular := regexp.MustCompile(binPattern)
 
 	powInt := func(x, y int) int { return int(math.Pow(float64(x), float64(y))) }
 
-	binConverted := regular.ReplaceAllStringFunc(text, func(s string) string {
+	binConverter := regular.ReplaceAllStringFunc(text, func(s string) string {
 		length := -1
 		decimal := 0
 
@@ -41,5 +41,5 @@ func BinToDec(text string) string {
 		return strconv.Itoa(decimal)
 	})
 
-	return binConverted
+	return binConverter
 }
