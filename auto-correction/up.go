@@ -14,9 +14,7 @@ var (
 func AlphaUp(text string) string {
 	upConverter := ""
 
-	if withoutDigit.MatchString(text) {
-		upConverter = upWithoutDigit(text)
-	}
+	upConverter = upWithoutDigit(text)
 	if withDigit.MatchString(upConverter) {
 		upConverter = upWithDigit(upConverter)
 	}
