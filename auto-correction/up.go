@@ -1,4 +1,4 @@
-package goreloaded
+package autocorrection
 
 import (
 	"regexp"
@@ -8,10 +8,10 @@ import (
 
 var (
 	withoutDigit = regexp.MustCompile(`(?i)(['!.,:;a-z0-9@#$%\^&*\(\)\]\[\{\}_+~|-]+)\s*\(up\)`)
-	withDigit    = regexp.MustCompile(`(?i)(['!.,:;a-z0-9@#$%\^&*\(\)\]\[\{\}_+~|-]+)\s*\(up(, \d+)\)`)
+	withDigit    = regexp.MustCompile(`(?i)(['!.,:;a-z0-9@#$%\^&*\(\)\]\[\{\}_+~|-]+)\s*\(up(,\s*\d+)\)`)
 )
 
-func AlphaUp(text string) string {
+func ToUpper(text string) string {
 	upConverter := ""
 
 	upConverter = upWithoutDigit(text)
@@ -28,12 +28,14 @@ func upWithoutDigit(text string) string {
 	upConverter = withoutDigit.ReplaceAllStringFunc(text, func(s string) string {
 		str := ""
 
+		s = s[:len(s)-4]
+
 		for i := 0; i < len(s); i++ {
 			char := s[i]
 
-			if i == len(s)-4 {
-				break
-			}
+			// if i == len(s)-4 || char == ' ' {
+			// 	break
+			// }
 
 			str += string(char)
 		}
@@ -46,12 +48,27 @@ func upWithoutDigit(text string) string {
 }
 
 func upWithDigit(text string) string {
-	numeric := regexp.MustCompile(`(?i)\(up(, \d+)\)`)
-	miniRegular := regexp.MustCompile(`(?i)\((up,)\s+|(\d+)\)`)
-
+	numeric := regexp.MustCompile(`(?i)\(up(,\s*\d+)\)`)
 	findDigits := numeric.FindAllString(text, -1)
+	resText := text
 	digitArr := []int{}
+	specialSymbols := map[rune]struct{}{
+		'.': {},
+		',': {},
+		':': {},
+		';': {},
+		'-': {},
+		'_': {},
+		'+': {},
+		'=': {},
+		'|': {},
+		'/': {},
+		'!': {},
+		'?': {},
+		' ': {},
+	}
 
+	// take number of flag realization
 	for _, str := range findDigits {
 		number := ""
 		for _, char := range str {
@@ -64,46 +81,48 @@ func upWithDigit(text string) string {
 		digitArr = append(digitArr, d)
 	}
 
-	index := miniRegular.FindAllStringIndex(text, -1)
-
-	noFurther := ""
-
-	if index[1][1] < len(text) {
-		noFurther = text[index[1][1]:]
-		noFurther = strings.TrimSpace(noFurther)
-	}
-
-	replaceUp := numeric.ReplaceAllStringFunc(text, func(s string) string {
-		return " "
-	})
-
-	strs := strings.Split(replaceUp, " ")
-
-	for i := range strs {
-		if strs[i] == noFurther && noFurther != "" {
-			strs = strs[:len(strs)-1]
-		}
-	}
-
 	for i := 0; i < len(digitArr); i++ {
+		index := numeric.FindStringIndex(resText)
+		space := false
+
+		if index[1] != len(resText) {
+			_, ok := specialSymbols[rune(resText[index[1]])]
+			if !ok {
+				space = true
+			}
+		}
+
+		strs := strings.Split(resText[:index[0]], " ")
+
 		for j := len(strs) - 1; digitArr[i] != 0; j-- {
 			if strs[j] != "" {
 				strs[j] = strings.ToUpper(strs[j])
+
+				if j == 0 {
+					break
+				}
+
 				digitArr[i]--
 			}
-			if j == 0 {
-				break
+		}
+
+		instStr := ""
+
+		for i, str := range strs {
+			instStr += str
+
+			if i != len(strs)-1 {
+				instStr += " "
 			}
 		}
+
+		if space {
+			resText = instStr + " " + resText[index[1]:]
+			continue
+		}
+
+		resText = instStr + resText[index[1]:]
 	}
 
-	str := ""
-
-	for _, s := range strs {
-		str += s + " "
-	}
-
-	str += noFurther
-
-	return str
+	return resText
 }

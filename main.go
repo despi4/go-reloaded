@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	goreloaded "go-reloaded/auto-correction"
@@ -27,20 +28,52 @@ func main() {
 	Result(inputFileName, outputFileName)
 }
 
-func CheckInput(input []string) {
-	// Checking input for having two arguments
-	if len(input) == 2 {
-		firstFileName, secondFileName := input[0], input[1]
+// func CheckInput(input []string) {
+// 	// Checking input for having two arguments
+// 	if len(input) == 2 {
+// 		firstFileName, secondFileName := input[0], input[1]
 
-		// Checking names of [.txt] files
-		if firstFileName[len(firstFileName)-4:] == ".txt" && secondFileName[len(secondFileName)-4:] == ".txt" {
-			_, err := os.Stat(firstFileName)
-			if err != nil {
-				log.Fatal("Input file not exist\n", err)
-			}
+// 		// Checking names of [.txt] files
+// 		if filepath.Ext(firstFileName) == ".txt" && filepath.Ext(secondFileName) == ".txt" {
+// 			_, err := os.Stat(firstFileName)
+// 			if err != nil {
+// 				log.Fatal("Input file not exist\n", err)
+// 			}
+// 		}
+// 	} else {
+// 		log.Fatal("Write two [.txt] files, for example | [inputfile.txt] [outputfile.txt]")
+// 	}
+// }
+
+func CheckInput(input []string) {
+	if len(input) != 2 {
+		log.Fatal("Write two [.txt] files, for example: [inputfile.txt] [outputfile.txt]")
+	}
+
+	inputPath, outputPath := input[0], input[1]
+
+	// Проверка расширений
+	if filepath.Ext(inputPath) != ".txt" || filepath.Ext(outputPath) != ".txt" {
+		log.Fatal("Both files must have .txt extension")
+	}
+
+	// Проверка существования входного файла
+	info, err := os.Stat(inputPath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Fatal("Input file does not exist:", inputPath)
 		}
-	} else {
-		log.Fatal("Write two [.txt] files, for example | [inputfile.txt] [outputfile.txt]")
+		log.Fatal("Error accessing input file:", err)
+	}
+
+	// Убедимся, что это файл, а не директория
+	if info.IsDir() {
+		log.Fatal("Input path is a directory, not a file:", inputPath)
+	}
+
+	// (Опционально) Проверка, что входной и выходной файлы — не одно и то же
+	if inputPath == outputPath {
+		log.Fatal("Input and output files must be different")
 	}
 }
 
@@ -72,10 +105,7 @@ func Result(inputFileName, outputFileName string) {
 			continue
 		}
 
-		line = goreloaded.ClearHexBin(line)
-		line = goreloaded.BinToDec(line)
-		line = goreloaded.HexToDec(line)
-		line = goreloaded.AlphaUp(line)
+		line = goreloaded.Navigator(line)
 
 		outputFile.Write([]byte(line + "\n"))
 	}
